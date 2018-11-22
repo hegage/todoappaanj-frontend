@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>TodoAppe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/solid.css" integrity="sha384-rdyFrfAIC05c5ph7BKz3l5NG5yEottvO/DQ0dCrwD8gzeQDjYBHNr1ucUpQuljos" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/regular.css" integrity="sha384-z3ccjLyn+akM2DtvRQCXJwvT5bGZsspS4uptQKNXNg778nyzvdMqiGcqHVGiAUyY" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/fontawesome.css" integrity="sha384-u5J7JghGz0qUrmEsWzBQkfvc8nK3fUT7DCaQzNQ+q4oEXhGSx+P2OqjWsfIRB8QT" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+
+    <script src="main.js"></script>
+    <script>
+
+
+        // Define our new application,
+        // Only run the app when the DOMContentLoaded is triggered.
+        // Meaning we dont try to access any of the Divs in the html before the page is fully loaded.
+        window.addEventListener('DOMContentLoaded', () => {
+            var app = new App('http://localhost:4200/', 'app');
+            app.init();
+        });
+        
+    </script>
+</head>
+
+<body>
+
+    <!-- App container -->
+    <div id="app"></div>
+
+    <template id="register">
+        <!-- TODO: Add registration -->
+    </template>
+
+    <template id="login">
+        <div class="login">
+            <h1>Login</h1>
+            <form>
+                <input type="text" id="userName" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+
+                <div class="login_buttons">
+                    <button type="button" class="btn" id="loginBt">Login</button>
+                    <button type="button" class="btn" id="createUserBt">Create User</button>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <template id="todoApp">
+        <div class="todoapp">
+            <div class="navbar">
+                <div class="left">
+                    <h1>TodoAppzz</h1>
+                </div>
+                <div class="center">
+                    <input type="text" id="listName">
+                    <button id="addNewList" class="btn">Add new list</button>
+                </div>
+                <div class="right">
+                    <button id="logout" class="btn">Logout <i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </div>
+            <div id="lists"></div>
+        </div>
+    </template>
+
+    <template id="list-template">
+        <div class="list">
+            <h2 class="list-title"></h2>
+            <div class="toolbar">
+                <div class="toolbar-item toolbar-item--delete">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <div class="toolbar-item">
+                    <i class="fas fa-edit"></i>
+                </div>
+            </div>
+            <ul class="list_items">
+                
+            </ul>
+        </div>
+    </template>
+
+    <template id="item-template">
+        <li class="list_item">
+            <div class="list_item-content">
+                <p class="list_item-title">
+                    <span class="list_item-check"></span>
+                    <span class="list_item-title_text"></span>
+                </p>
+            </div>
+            <div class="list_item-meta">
+                <span class="list_item-meta_created"></span>
+                <span class="list_item-meta_updated"></span>
+            </div>
+            <span class="list_item-delete"><i class="fas fa-trash-alt"></i></span>
+        </li>
+    </template>
+
+</body>
+
+</html>

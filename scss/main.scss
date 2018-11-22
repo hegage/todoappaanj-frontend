@@ -1,0 +1,119 @@
+$dark-blue: #111235;
+$blue: #202a51;
+$white: #fafafa;
+$danger: #9D2A24;
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    color: $white;
+    background-image: radial-gradient($blue, $dark-blue);
+    background-size: cover;
+    background-attachment: fixed;
+    transform-style: preserve-3d;
+    overflow: scroll;
+    font-family: 'Lato', sans-serif;
+    #app {padding-top: 6rem;}
+}
+
+
+@import 'scss/lists';
+
+
+.login {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    margin: 0 auto;
+    padding-top: 10vh;
+
+    form {
+        display: flex;
+        flex-direction: column;
+
+        input {
+            height: 2rem;
+            padding: 0.3rem;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+
+.navbar {
+    height: 85px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: darken($white, 10%);
+    color: $blue;
+    box-shadow: 2px 2px 2px #000;
+    display: flex;
+    justify-content: space-between;
+    z-index: 3; 
+    .left {
+        padding-left: 1rem;
+        align-self: center;
+    }
+    .center {
+        align-self: center;
+    }
+    .right {
+        padding-right: 1rem;
+        align-self: center;
+    }
+    input {
+        height: 1.6rem;
+        padding: 0.3rem;
+        font-size: 1.25rem;
+    }
+}
+
+
+.btn {
+    margin-right: 1em;
+    /* remove this while use*/
+    margin-bottom: 1em;
+    display: inline-block;
+    outline: none;
+
+    text-align: center;
+    text-decoration: none;
+    font-family: inherit;
+    font-weight: 300;
+    letter-spacing: 1px;
+    vertical-align: middle;
+    border: 1px solid;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.01);
+    font-size: 1rem;
+    padding: 0.5em 1.5em;
+
+    transition: background 250ms ease-in-out;
+
+    &:hover {
+        background: lighten($blue, 65%);
+        cursor: pointer;
+    }
+
+    &--blue {
+        background-color: $blue;
+        color: $white;
+        &:hover{
+            color: $blue;
+        }
+    }
+
+    &--dark-blue {
+        background-color: $dark-blue;
+    }
+}
