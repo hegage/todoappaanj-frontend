@@ -27,8 +27,7 @@ p a {
 
 #lists {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between; }
+  flex-direction: column; }
   @media (min-width: 1200px) {
     #lists {
       flex-direction: row; } }
@@ -108,7 +107,6 @@ p a {
   .list_footer {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     margin-top: 2rem; }
     .list_footer input {
       margin-right: 1rem;
