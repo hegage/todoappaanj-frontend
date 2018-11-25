@@ -1,41 +1,17 @@
+
 /**
  * TodoApp
- * 
+ *
  * @class App
  */
 class App {
-    constructor(apiUrl, appContainer) {
-        this.lists;
-        this.apiUrl       = apiUrl;
-        this.ui           = new UIHelpers();
-        this.appContainer = (typeof appContainer !== 'undefined') ? document.getElementById(appContainer) : document.getElementById('app');
-    }
-    
-    /**
-     * Runs the app with our starting values and displays.
-     *
-     * This is running as an async so that we dont
-     * try to access the DOM elements before our
-     * fetch request is completed.
-     * 
-     * https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-     * 
-     * @memberof App
-     */
-    init() {
-        this.checkValidation().then(res=> {
-            if (res) {
-                this.clearScreen(); 
-                this.renderTodoApp();
-            } else {
-                this.renderLogin();
-            }
-        })
-    }
-
     /**
      * Sends a validation request to the api.
      * Returns a json object with a valid: true/false.
+     *
+     * JWT Validation should be implemented in the frontend as well
+     * but this works as a substitution, letting the backend
+     * handle validation and responding to that.
      *
      * @returns Promise
      * @memberof App
@@ -50,14 +26,16 @@ class App {
                 },
             });
 
-            const res_1 = await res.json();
-            return res_1.valid;
+            const token = await res.json();
+            return token.valid;
         } catch (err) {
             return false;
         }
     }
 
     /**
+     * Get the current token from localstorage.
+     *
      * @readonly
      * @memberof App
      */
@@ -66,78 +44,130 @@ class App {
     }
 
     /**
-     * @static
+     * Add a new todo item.
+     *
+     * @param Number listId, of the list we are adding to
+     * @param Object data
      * @memberof App
      */
-    static set authenticatedUser(value) {
-        this.authenticatedUser = value;
-        localStorage.setItem('auth', value);
-    }
-
-    /**
-     * Delete a single list item.
-     * 
-     * @param Number id
-     * @memberof App
-     */
-    deleteItem(id) {
-        fetch(this.apiUrl + 'items/' + id, {
-            method: 'DELETE',
+    async addItem(listId, data) {
+       const res = await fetch(this.apiUrl + 'items/' + listId, {
+            method: 'POST',
+            body: JSON.stringify(data),
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-            },
-        }).then(res => {
-            this.renderTodoApp();
-            // window.location.reload();
-        }).catch(err => console.log(err))
+                'Authorization': `Bearer ${this.token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        await res.json();
+        this.renderTodoApp();
     }
 
     /**
-     * Changes the status to complete for the item.
+     * Delete a single list item and render the application again.
+     *
+     * TODO: Handle better with ajax instead of reloading.
      *
      * @param Number id
      * @memberof App
      */
-    setCompleted(id) {
-        fetch(this.apiUrl + 'items/' + id + '/setstatus', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-            },
-        }).then(() => {
+    async deleteItem(id) {
+        try {
+            await fetch(this.apiUrl + 'items/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+            });
             this.renderTodoApp();
-        }).catch(err => console.log(err))
+        } catch (err) {
+            return console.log(err);
+        }
     }
 
     /**
-     * Delete a whole list.
+     * Changes the status of the item.
+     * If its completed marks it uncomplete.
+     * If its uncomplete mark it as complete.
+     *
+     * FIX: There is a bug when its first triggered we need to click twice.
+     *
+     * TODO: Better error handling. Should provide some information to the user.
      *
      * @param Number id
      * @memberof App
      */
-    deleteList(id) {
-        fetch(this.apiUrl + 'lists/' + id, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${this.token}`
-            },
-        }).then(res => {
+    async setCompleted(id) {
+        try {
+            await fetch(this.apiUrl + 'items/' + id + '/setstatus', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+            });
             this.renderTodoApp();
-        }).catch(err => console.log(err))
+        }
+        catch (err) {
+            return console.log(err);
+        }
     }
 
-    renderRegistration() {
-        const clone = this.ui.cloneTemplate('#register')
-        this.appContainer.appendChild(clone);
+    /**
+     * Adds a new list and render the application
+     *
+     * @param String title
+     * @returns void
+     * @memberof App
+     */
+    async addList(title) {
+        try {
+            await fetch('http://localhost:4200/' + 'lists', {
+                method: 'POST',
+                body: JSON.stringify({ "name": title }),
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+            return this.renderTodoApp();
+        }
+        catch (error) {
+            return console.log(error);
+        }
     }
 
-    clearScreen() {
-        this.appContainer.innerHTML = "";
+    /**
+     * Delete an entire lists, items included.
+     *
+     * TODO: Should provide some user warning.
+     * TODO: Better error handling. Should provide some information to the user.
+     *
+     * @param Number id
+     * @memberof App
+     */
+    async deleteList(id) {
+        try {
+            await fetch(this.apiUrl + 'lists/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`
+                },
+            });
+            this.renderTodoApp();
+        } catch (err) {
+            return console.log(err);
+        }
     }
 
+    /**
+     * Logs out the user.
+     * Clear storage, DOM and render login.
+     *
+     * @memberof App
+     */
     logoutUser(){
         localStorage.removeItem('auth.token')
         this.clearScreen();
@@ -145,18 +175,15 @@ class App {
     }
 
     /**
-     * Renders the todoapp and adds the lists with items.
-     * 
-     * TODO: This async thing is making items render poorly.
-     * (I.e. Different and/-or random order for each reload)
+     * Renders the todoapp and fetches the items from the API.
      *
      * @memberof App
      */
     async renderTodoApp() {
         this.clearScreen();
-        
+
         // Get the template
-        const template = document.getElementById('todoApp').content.cloneNode(true);
+        const template = this.ui.cloneTemplate('todoApp');
         this.appContainer.appendChild(template);
 
         // Add logout event to the logout button.
@@ -164,19 +191,10 @@ class App {
             this.logoutUser();
         })
 
-        // Add event when adding a new list item.
+        // Create an event listener for creating a new list.
         document.getElementById('addNewList').addEventListener('click', () => {
-            const newListInput = document.getElementById('listName').value;
-            fetch('http://localhost:4200/' + 'lists', {
-                    method: 'POST',
-                    body: JSON.stringify({ "name": newListInput }),
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(() => this.renderLists())
-                .catch(error => console.log(error));
+            const title = document.getElementById('listName').value;
+            this.addList(title);
         });
 
         // Fetch lists and loop over all ids then fetch list items per list.
@@ -189,71 +207,91 @@ class App {
 
         lists = await lists.json();
 
-        // Loop over lists and fetch items.
-        await lists.data.forEach(item => {
-            fetch(this.apiUrl + 'lists/' + item.id, {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(response => {
-                this.renderLists(item, response.extras)
-            });
-        });
+        if (lists.length > 1) {
+            this.renderLists(lists);
+        }
     }
 
     /**
-     * render the lists with items
+     * Render the lists with items
      *
-     * @param  Object todoList 
-     * @param  Array<Object> todoItems
+     * @param Array todoList
      * @memberof App
      */
-    renderLists(todoList, todoItems) {
+    renderLists(todoList) {
         var itemsList = document.getElementById('lists');
-        
-        // Get the template
-        var list = document.getElementById('list-template').content.cloneNode(true);
+        todoList.forEach(item => {
 
-        // Assign text to slot in template using classname
-        list.querySelector('.list-title').innerText              = todoList.name;
-        list.querySelector('.toolbar-item--delete i').dataset.id = todoList.id;
-        list.querySelector('.toolbar-item--delete').addEventListener('click', (event) => {
-            this.deleteList(event.target.dataset.id);
-        })
+            // Get the template
+            var list = document.getElementById('list-template').content.cloneNode(true);
 
-        todoItems.forEach(item => {
-            // Get the list item template.
-            const template = document.getElementById('item-template').content.cloneNode(true);
-            
-            template.querySelector('.list_item-title_text').innerText   = item.title;
+            // Assign text to slot in template using classname
+            list.querySelector('.list_title').innerText = item.title;
+            list.querySelector('.toolbar-item--delete i').dataset.id = item.id;
+            list.querySelector('.toolbar-item--delete').addEventListener('click', (event) => {
+                this.deleteList(event.target.dataset.id);
+            })
 
-            // Insert meta data.
-            template.querySelector('.list_item-meta_created').innerText = item.created_at;
-            template.querySelector('.list_item-meta_updated').innerText = item.updated_at;
+            list.querySelector('.add').dataset.id = item.id;
 
-            // Handle the status of the item.
-            template.querySelector('.list_item-check').innerHTML = `<i class="far fa-circle" data-id="${item.id}"></i>`;
-            template.querySelector('.list_item-check').addEventListener('click', (event) => {
-                this.setCompleted(event.target.dataset.id);
-            });
+            list.querySelector('.add').addEventListener('click', (event) => {
+                const input = event.target.previousElementSibling.firstElementChild.value;
+                if (!input) { alert('You need to write a title'); return; }
+                this.addItem(event.target.dataset.id, { title: input });
+            })
 
-            if(item.completed === 1 ){
-                template.querySelector('.list_item').classList.add('list_item--completed')
-                template.querySelector('.list_item-check').innerHTML = `<i class="far fa-check-circle" data-id="${item.id}"></i>`;
+            if (item.hasOwnProperty('items')) {
+                item.items.forEach(listitem => {
+                    // Get the list item template.
+                    const template = document.getElementById('item-template').content.cloneNode(true);
+
+                    template.querySelector('.list_item-title_text').innerText = listitem.title;
+
+                    // Insert meta data.
+                    template.querySelector('.list_item-meta_created').innerText = listitem.created_at;
+                    template.querySelector('.list_item-meta_updated').innerText = listitem.updated_at;
+
+                    // Handle the status of the item.
+                    template.querySelector('.list_item-delete').dataset.id = listitem.id;
+                    template.querySelector('.list_item-delete').addEventListener('click', (event) => {
+                        this.deleteItem(event.target.dataset.id);
+                    });
+
+                    template.querySelector('.list_item-check').innerHTML = `<i class="far fa-circle" data-id="${listitem.id}"></i>`;
+                    template.querySelector('.list_item-check').addEventListener('click', (event) => {
+                        this.setCompleted(event.target.dataset.id);
+                    });
+
+                    if (listitem.completed === 1) {
+                        template.querySelector('.list_item').classList.add('list_item--completed')
+                        template.querySelector('.list_item-check').innerHTML = `<i class="far fa-check-circle" data-id="${listitem.id}"></i>`;
+                    }
+
+                    list.querySelector('.list_items').appendChild(template);
+                    return;
+                })
             }
 
-            list.querySelector('.list_items').appendChild(template);
+            itemsList.appendChild(list);
         });
-        
-        itemsList.appendChild(list);
     }
 
-    renderLogin() {
-        const clone = this.ui.cloneTemplate('#login')
+
+    /**
+     * Render login UI.
+     *
+     * If we get an email we render that in the input.
+     *
+     * @param String email
+     * @memberof App
+     */
+    renderLogin(email) {
+        this.clearScreen();
+
+        const clone = this.ui.cloneTemplate('login')
         this.appContainer.appendChild(clone);
+
+        if (email) { document.getElementById('userName').value = email; }
 
         let loginBt = document.querySelector("#loginBt");
         loginBt.addEventListener('click', () => {
@@ -276,23 +314,89 @@ class App {
                     if (data.status === 200) {
                         return data.json()
                     } else {
+                        alert('No user found with the credentials provided.')
                         return new Error(data);
                     }
                 }).then(json => {
-                    localStorage.setItem('auth.token', json.token)
-                    this.clearScreen();
-                    this.renderTodoApp();
+                    if (json.token) {
+                        localStorage.setItem('auth.token', json.token)
+                        this.clearScreen();
+                        this.renderTodoApp();
+                    }
                 }).catch(err => {
                     console.log(err);
                 })
             }
         })
 
-        // TODO: Add registration button event listener.
         let createBt = document.querySelector("#createUserBt");
+        createBt.addEventListener('click', () => {
+            this.renderRegistration();
+        })
     }
 
-}   
+    /**
+     * Render registration UI
+     *
+     * @memberof App
+     */
+    renderRegistration() {
+        this.clearScreen();
+        const clone = this.ui.cloneTemplate('registration')
+        this.appContainer.appendChild(clone);
+
+        document.getElementById('create').addEventListener('click', () => {
+            const username = document.getElementById('userName').value;
+            const email    = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const data     = {
+                username : username,
+                email    : email,
+                password : password
+            };
+            if (!data.username) { return; }
+
+            fetch(this.apiUrl + 'users', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(res => {
+                this.renderWelcome(res.data);
+            })
+
+        })
+    }
+
+    /**
+     * Render welcome UI after registration complete.
+     *
+     * @param Object user
+     * @memberof App
+     */
+    renderWelcome(user) {
+        var user = user[0];
+        this.clearScreen();
+
+        const template = document.getElementById('welcome').content.cloneNode(true);
+        template.querySelector('.username').innerText = user.username;
+
+        this.appContainer.append(template);
+
+        document.getElementById('login').addEventListener('click', () => {
+            this.renderLogin(user.email);
+        })
+    }
+
+    /**
+     * Empty the dom before new rendering
+     *
+     * @memberof App
+     */
+    clearScreen() { this.appContainer.innerHTML = ""; }
+}
 
 /**
  * Helpers to deal with UI changes.
@@ -310,25 +414,15 @@ class UIHelpers {
     append(parent, element) {
         parent.appendChild(element)
     }
+
     /**
      * Prepend a HTML Element to another Element.
-     * 
-     * @param HTMLElement parent 
-     * @param HTMLElement element 
+     *
+     * @param HTMLElement parent
+     * @param HTMLElement element
      */
     prepend(parent, element) {
         parent.prepend(element)
-    }
-
-
-    /**
-     * Create a new HTMLElement
-     *
-     * @param HTMLElement|string element
-     * @returns
-     */
-    createNode(element) {
-        return document.createElement(element);
     }
 
     /**
@@ -339,9 +433,40 @@ class UIHelpers {
      * @memberof UIHelpers
      */
     cloneTemplate(id) {
-        const template = document.querySelector(id);
-        const clone = document.importNode(template.content, true);
-        return clone
+        return document.getElementById(id).content.cloneNode(true);
     }
 
+}
+
+
+class TodoApp extends App {
+    constructor(apiUrl, appContainer) {
+        super();
+        this.lists;
+        this.apiUrl       = apiUrl;
+        this.ui           = new UIHelpers();
+        this.appContainer = (typeof appContainer !== 'undefined') ? document.getElementById(appContainer) : document.getElementById('app');
+    }
+
+    /**
+     * Runs the app with our starting values and displays.
+     *
+     * This is running as an async so that we dont
+     * try to access the DOM elements before our
+     * fetch request is completed.
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+     *
+     * @memberof App
+     */
+    init() {
+        this.checkValidation().then(res=> {
+            if (res) {
+                this.clearScreen();
+                this.renderTodoApp();
+            } else {
+                this.renderLogin();
+            }
+        })
+    }
 }

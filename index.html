@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>TodoAppe</title>
+    <title>TodoApp</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/solid.css" integrity="sha384-rdyFrfAIC05c5ph7BKz3l5NG5yEottvO/DQ0dCrwD8gzeQDjYBHNr1ucUpQuljos" crossorigin="anonymous">
@@ -15,16 +15,15 @@
 
     <script src="main.js"></script>
     <script>
-
-
         // Define our new application,
         // Only run the app when the DOMContentLoaded is triggered.
         // Meaning we dont try to access any of the Divs in the html before the page is fully loaded.
+        // TODO: Should have a .env here as well so we dont publish the urls to git.
         window.addEventListener('DOMContentLoaded', () => {
-            var app = new App('https://todoappaanj-backend.herokuapp.com/', 'app');
-            app.init();
+            // var app = new App('https://todoappaanj-backend.herokuapp.com/', 'app');
+            var todo = new TodoApp('http://localhost:4200/', 'app');
+            todo.init();
         });
-        
     </script>
 </head>
 
@@ -32,10 +31,6 @@
 
     <!-- App container -->
     <div id="app"></div>
-
-    <template id="register">
-        <!-- TODO: Add registration -->
-    </template>
 
     <template id="login">
         <div class="login">
@@ -52,19 +47,46 @@
         </div>
     </template>
 
+    <template id="registration">
+        <div class="login">
+            <h1>Registration</h1>
+            <p>Create your new user!</p>
+            <form>
+                <input type="text" id="userName" placeholder="Username">
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+
+                <div class="login_buttons">
+                    <button type="button" class="btn" id="create">Create User</button>
+                </div>
+                <p>
+                    <a href="index.html">Already have a user?</a>
+                </p>
+            </form>
+        </div>
+    </template>
+
+    <template id="welcome">
+        <div class="login">
+            <h1>Welcome,  <span class="username"></span>!</h1>
+            <p>You can now sign in with your new account</p>
+            <button type="button" class="btn" id="login">Log in</button>
+        </div>
+    </template>
+
     <template id="todoApp">
         <div class="todoapp">
             <div class="navbar">
                 <div class="left">
                     <h1>TodoAppzz</h1>
                 </div>
-                <div class="center">
-                    <input type="text" id="listName">
-                    <button id="addNewList" class="btn">Add new list</button>
-                </div>
                 <div class="right">
                     <button id="logout" class="btn">Logout <i class="fas fa-sign-out-alt"></i></button>
                 </div>
+            </div>
+            <div class="center">
+                <input type="text" id="listName" class="form-input">
+                <button id="addNewList" class="btn">Add new list</button>
             </div>
             <div id="lists"></div>
         </div>
@@ -72,7 +94,7 @@
 
     <template id="list-template">
         <div class="list">
-            <h2 class="list-title"></h2>
+            <h2 class="list_title"></h2>
             <div class="toolbar">
                 <div class="toolbar-item toolbar-item--delete">
                     <i class="fas fa-trash-alt"></i>
@@ -81,10 +103,18 @@
                     <i class="fas fa-edit"></i>
                 </div>
             </div>
-            <ul class="list_items">
-                
-            </ul>
+            <div class="list_footer">
+                <div class="add_input">
+                    <input type="text" name="item" class="additem" placeholder="Add new todo">
+                </div>
+                <div class="add" id="addItem"><i class="fas fa-2x fa-plus-circle"></i></div>
+            </div>
+            <ul class="list_items"></ul>
         </div>
+    </template>
+
+    <template id="single-list">
+
     </template>
 
     <template id="item-template">

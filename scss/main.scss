@@ -16,14 +16,39 @@ body {
     background-size: cover;
     background-attachment: fixed;
     transform-style: preserve-3d;
-    overflow: scroll;
     font-family: 'Lato', sans-serif;
     #app {padding-top: 6rem;}
+    // Small devices (landscape phones, 576px and up)
+    @media (min-width: 576px) {
+        overflow: hidden;
+     }
+
+    // Medium devices (tablets, 768px and up)
+    // @media (min-width: 768px) { ... }
+
+    // Large devices (desktops, 992px and up)
+    // @media (min-width: 992px) { ... }
+
+    // Extra large devices (large desktops, 1200px and up)
+    @media (min-width: 1200px) {
+        overflow: scroll;
+     }
+}
+
+p a {
+    color: $white;
+    &:visited { color: $white;}
 }
 
 
 @import 'scss/lists';
 
+.form-input {
+    height: 2rem;
+    padding: 0.3rem;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
 
 .login {
     width: 300px;
@@ -46,7 +71,15 @@ body {
     }
 }
 
-
+.center {
+    align-self: center;
+    padding: 1rem 0;
+    align-self: center;
+    display: flex;
+    input {
+        max-width: 50%;
+    }
+}
 .navbar {
     height: 85px;
     width: 100%;
@@ -58,14 +91,12 @@ body {
     box-shadow: 2px 2px 2px #000;
     display: flex;
     justify-content: space-between;
-    z-index: 3; 
+    z-index: 3;
     .left {
         padding-left: 1rem;
         align-self: center;
     }
-    .center {
-        align-self: center;
-    }
+
     .right {
         padding-right: 1rem;
         align-self: center;

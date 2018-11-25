@@ -10,22 +10,39 @@ body {
   background-size: cover;
   background-attachment: fixed;
   transform-style: preserve-3d;
-  overflow: scroll;
   font-family: 'Lato', sans-serif; }
   body #app {
     padding-top: 6rem; }
+  @media (min-width: 576px) {
+    body {
+      overflow: hidden; } }
+  @media (min-width: 1200px) {
+    body {
+      overflow: scroll; } }
+
+p a {
+  color: #fafafa; }
+  p a:visited {
+    color: #fafafa; }
 
 #lists {
   display: flex;
+  flex-direction: column;
   justify-content: space-between; }
+  @media (min-width: 1200px) {
+    #lists {
+      flex-direction: row; } }
 
 .toolbar {
-  display: none;
+  display: inline-flex;
   margin-left: 1rem;
-  opacity: 0;
   padding: 0.5rem;
   transition: all 250ms ease-in-out;
   background: #fff; }
+  @media (min-width: 1200px) {
+    .toolbar {
+      display: none;
+      opacity: 0; } }
   .toolbar-item {
     color: #202a51; }
     .toolbar-item:nth-child(1) {
@@ -37,14 +54,19 @@ body {
     opacity: 1 !important; }
 
 .list {
-  min-width: 400px;
-  margin: 0 2rem;
+  margin-left: 1rem;
+  margin-right: 5rem;
+  margin-bottom: 2rem;
   transition: all 250ms ease-in-out; }
+  @media (min-width: 1200px) {
+    .list {
+      min-width: 400px; } }
   .list:hover .toolbar {
     display: inline-flex;
     opacity: 0.5; }
-  .list-title {
-    display: inline-block; }
+  .list_title {
+    display: inline-block;
+    margin-bottom: 1rem; }
   .list_items {
     padding: 0;
     color: #000; }
@@ -77,10 +99,32 @@ body {
       .list_item-delete:hover {
         color: #9D2A24;
         cursor: pointer; }
+      .list_item-delete i {
+        pointer-events: none; }
     .list_item-meta {
       font-size: 1rem;
       padding: 0.5rem;
       background: #f1f1f1; }
+  .list_footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 2rem; }
+    .list_footer input {
+      margin-right: 1rem;
+      height: 2rem;
+      padding: 0.3rem;
+      font-size: 1.25rem; }
+    .list_footer .add {
+      display: flex; }
+      .list_footer .add i {
+        pointer-events: none; }
+
+.form-input {
+  height: 2rem;
+  padding: 0.3rem;
+  font-size: 1.25rem;
+  margin-bottom: 1rem; }
 
 .login {
   width: 300px;
@@ -98,6 +142,14 @@ body {
       font-size: 1.25rem;
       margin-bottom: 1rem; }
 
+.center {
+  align-self: center;
+  padding: 1rem 0;
+  align-self: center;
+  display: flex; }
+  .center input {
+    max-width: 50%; }
+
 .navbar {
   height: 85px;
   width: 100%;
@@ -112,8 +164,6 @@ body {
   z-index: 3; }
   .navbar .left {
     padding-left: 1rem;
-    align-self: center; }
-  .navbar .center {
     align-self: center; }
   .navbar .right {
     padding-right: 1rem;
