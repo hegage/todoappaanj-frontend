@@ -123,7 +123,7 @@ class App {
      */
     async addList(title) {
         try {
-            await fetch('http://localhost:4200/' + 'lists', {
+            await fetch(this.apiUrl + 'lists', {
                 method: 'POST',
                 body: JSON.stringify({ "name": title }),
                 headers: {
