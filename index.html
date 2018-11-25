@@ -20,7 +20,7 @@
         // Meaning we dont try to access any of the Divs in the html before the page is fully loaded.
         // TODO: Should have a .env here as well so we dont publish the urls to git.
         window.addEventListener('DOMContentLoaded', () => {
-            var todo = new App('https://todoappaanj-backend.herokuapp.com/', 'app');
+            var todo = new TodoApp('https://todoappaanj-backend.herokuapp.com/', 'app');
             todo.init();
         });
     </script>
